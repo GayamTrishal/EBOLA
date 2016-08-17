@@ -131,71 +131,81 @@ During the contest, your submissions will be evaluated on the test files. If you
              node *right,*left;
             };
     class adj_list{
-                    node *front,*rear;
-                public:
-                    void push(long long int);
-                    void adj();
-                    bool check();
-                    long long int find_max();
-                    void clear();
-                    adj_list()
-                    {
-                        front=NULL;
-                        rear=NULL;
-                    }
-                }y;
-void adj_list::push(long long int x)
-{
-    node *add;
-    add=new struct node;
-    add->val=x;
-    add->right=NULL;
-    add->left=NULL;
-    if(front==NULL)
+                        node *front,*rear;
+                    public:
+                        void push(long long int);
+                        void adj();
+                        bool check();
+                        long long int find_max();
+                        void clear();
+                        adj_list()
+                        {
+                            front=NULL;
+                            rear=NULL;
+                        }
+                    }y;
+    void adj_list::push(long long int x)
     {
-        front=add;
-        rear=add;
+        node *add;
+        add=new struct node;
+        add->val=x;
+        add->right=NULL;
+        add->left=NULL;
+        if(front==NULL)
+        {
+            front=add;
+            rear=add;
+        }
+        else
+        {
+            add->left=rear;
+            rear->right=add;
+            rear=add;
+        }
     }
-    else
+    void adj_list::adj()
     {
-        add->left=rear;
-        rear->right=add;
-        rear=add;
+        if(front==NULL)
+            return;
+        else
+        {
+            node *ptr;
+            ptr=front;
+            while(ptr!=rear)
+            {
+                if(v[ptr->val]==0)
+                    y.push(ptr->val);
+                ptr=ptr->right;
+            }
+            if(v[ptr->val]==0)
+                y.push(ptr->val);
+        }
     }
-}
-void adj_list::adj()
-{
-    if(front==NULL)
-        return;
-    else
+    bool adj_list::check()
+    {   
+        if(front==NULL)
+            return false;
+        else
+            return true;
+    }
+    long long int adj_list::find_max()
     {
         node *ptr;
+        long long int max=front->val;
+        v[max]=2;
         ptr=front;
         while(ptr!=rear)
         {
-            if(v[ptr->val]==0)
-                y.push(ptr->val);
+            if(w[max]<w[ptr->val])
+            {
+                v[max]=1;
+                max=ptr->val;
+                v[max]=2;
+            }
+            else
+                v[ptr->val]=1;
             ptr=ptr->right;
         }
-        if(v[ptr->val]==0)
-            y.push(ptr->val);
-    }
-}
-bool adj_list::check()
-{
-    if(front==NULL)
-        return false;
-    else
-        return true;
-}
-long long int adj_list::find_max()
-{
-    node *ptr;
-    long long int max=front->val;
-    v[max]=2;
-    ptr=front;
-    while(ptr!=rear)
-    {
         if(w[max]<w[ptr->val])
         {
             v[max]=1;
@@ -204,127 +214,117 @@ long long int adj_list::find_max()
         }
         else
             v[ptr->val]=1;
-        ptr=ptr->right;
+        return max;
     }
-    if(w[max]<w[ptr->val])
+    void adj_list::clear()
     {
-        v[max]=1;
-        max=ptr->val;
-        v[max]=2;
-    }
-    else
-        v[ptr->val]=1;
-    return max;
-}
-void adj_list::clear()
-{
-    node *ptr;
-    ptr=front;
-    while(ptr!=rear)
-    {
-        node *del;
-        del=ptr;
-        ptr=ptr->right;
-        delete del;
-    }
-    delete ptr;
-    front=NULL;
-    rear=NULL;
-}
-int main()
-{
-    long long int n,m,s,k;
-    cin>>n>>m>>k>>s;
-    long long int i,u,z,p,j,max2;
-    w[0]=0;
-    adj_list x[n+1];
-    for(i=0;i<=n;i++)
-        v[i]=0;
-    for(i=1;i<=n;i++)
-        cin>>w[i];
-    for(i=0;i<m;i++)
-    {
-        cin>>u>>z;
-        x[u].push(z);
-        x[z].push(u);
-    }
-    v[s]=1;
-    for(j=0;j<k;j++)
-    {
-        for(i=1;i<=n;i++)
+        node *ptr;
+        ptr=front;
+        while(ptr!=rear)
         {
-            if(v[i]==1)
-                x[i].adj();
+            node *del;
+            del=ptr;
+            ptr=ptr->right;
+            delete del;
         }
-        if(y.check())
+        delete ptr;
+        front=NULL;
+        rear=NULL;
+    }
+    int main()
+    {
+        long long int n,m,s,k;
+        cin>>n>>m>>k>>s;
+        long long int i,u,z,p,j,max2;
+        w[0]=0;
+        adj_list x[n+1];
+        for(i=0;i<=n;i++)
+            v[i]=0;
+        for(i=1;i<=n;i++)
+            cin>>w[i];
+        for(i=0;i<m;i++)
         {
-            max2=0;
-            p=y.find_max();
+            cin>>u>>z;
+            x[u].push(z);
+            x[z].push(u);
+        }
+        v[s]=1;
+        for(j=0;j<k;j++)
+        {
             for(i=1;i<=n;i++)
             {
-                if(v[i]==0)
-                {
-                    if(w[max2]<w[i])
-                        max2=i;
-                }
+                if(v[i]==1)
+                    x[i].adj();
             }
-            if(w[p]<w[max2])
+            if(y.check())
             {
-                v[p]=1;
-                v[max2]=2;
-                p=max2;
+                max2=0;
+                p=y.find_max();
+                for(i=1;i<=n;i++)
+                {
+                    if(v[i]==0)
+                    {
+                        if(w[max2]<w[i])
+                            max2=i;
+                    }
+                }
+                if(w[p]<w[max2])
+                {
+                    v[p]=1;
+                    v[max2]=2;
+                    p=max2;
+                }
+                cout<<p<<"\n";
+                y.clear();
             }
-            cout<<p<<"\n";
-            y.clear();
+            else
+                break;
         }
-        else
-            break;
-    }
-    k=k-j;
-    long long int max,count=0;
-    for(i=1;i<=n;i++)
-    {
-        if(v[i]==0)
-            count++;
-    }
-    if(k>0)
-    {
-    if(count<=k)
-    {
+        k=k-j;
+        long long int max,count=0;
         for(i=1;i<=n;i++)
         {
             if(v[i]==0)
-                cout<<i<<"\n";
+                count++;
         }
-        k-=count;
-        for(i=1;(i<=n)&&(k>0);i++)
+        if(k>0)
         {
-            if(v[i]==1)
+            if(count<=k)
             {
-                cout<<i<<"\n";
-                k--;
-            }
-        }
-    }
-    else
-    {
-        while(k--)
-        {
-            max=0;
-            for(i=1;i<=n;i++)
-            {
-                if(v[i]==0)
+                for(i=1;i<=n;i++)
                 {
-                    if(w[max]<w[i])
-                        max=i;
+                    if(v[i]==0)
+                        cout<<i<<"\n";
+                }
+                k-=count;
+                for(i=1;(i<=n)&&(k>0);i++)
+                {
+                    if(v[i]==1)
+                    {
+                        cout<<i<<"\n";
+                        k--;
+                    }
+                }
+            }   
+            else
+            {
+                while(k--)
+                {
+                    max=0;
+                    for(i=1;i<=n;i++)
+                    {
+                        if(v[i]==0)
+                        {
+                            if(w[max]<w[i])
+                                max=i;
+                        }
+                    }
+                    cout<<max<<"\n";
+                    v[max]=2;
+                    if(k==0)
+                        break;
                 }
             }
-            cout<<max<<"\n";
-            v[max]=2;
-            if(k==0)
-                break;
-        }
+        }   
+        return 0;
     }
-    }
-    return 0;
-}
